@@ -4,6 +4,11 @@
     "output_path": "data/processed/food_small.parquet",
     "max_rows": 1000000
   },
+  "cassandra": {
+    "keyspace": "openfoodfacts",
+    "source_table": "products",
+    "result_table": "product_clusters"
+  },
   "model": {
     "output_path": "models/openfoodfacts_kmeans",
     "metrics_path": "artifacts/kmeans_metrics.json",
@@ -18,17 +23,7 @@
     "max_iter": 50,
     "tolerance": 0.0001
   },
-  "preprocessing_features": [
-    "energy-kcal",
-    "fat",
-    "saturated-fat",
-    "carbohydrates",
-    "sugars",
-    "fiber",
-    "proteins",
-    "salt"
-  ],
-  "model_features": [
+  "features": [
     "energy-kcal",
     "fat",
     "carbohydrates",
