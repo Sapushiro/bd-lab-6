@@ -19,7 +19,7 @@ class ClusterEvaluator:
         self.log = logger.get_logger(__name__)
 
         model_config = self.config["model"]
-        self.feature_names = self.config["model_features"]
+        self.feature_names = self.config["features"]
         self.predictions_path = model_config["predictions_path"]
         self.profiles_path = model_config["profiles_path"]
         self.categories_path = model_config["categories_path"]

@@ -21,7 +21,7 @@ class KMeansTrainer:
         self.log = logger.get_logger(__name__)
 
         self.input_path = self.config["data"]["output_path"]
-        self.feature_names = self.config["model_features"]
+        self.feature_names = self.config["features"]
 
         model_config = self.config["model"]
 

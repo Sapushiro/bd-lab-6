@@ -23,7 +23,7 @@ class OpenFoodFactsPreprocessor:
         self.output_path = self.config["data"]["output_path"]
         self.max_rows = self.config["data"]["max_rows"]
         self.seed = self.config["model"]["seed"]
-        self.feature_names = self.config["preprocessing_features"]
+        self.feature_names = self.config["features"]
 
     @staticmethod
     def _load_config(config_path: str) -> dict:
@@ -109,12 +109,9 @@ class OpenFoodFactsPreprocessor:
         maximum_values = {
             "energy-kcal": 1000.0,
             "fat": 100.0,
-            "saturated-fat": 100.0,
             "carbohydrates": 100.0,
-            "sugars": 100.0,
-            "fiber": 100.0,
             "proteins": 100.0,
-            "salt": 25.0,
+            "sugars": 100.0,
         }
 
         conditions = [
