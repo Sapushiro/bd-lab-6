@@ -1,0 +1,4 @@
+Apache Spark processes big data
+PySpark uses Python and Apache Spark
+Spark distributes data processing
+Python is useful for big data

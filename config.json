@@ -1,0 +1,38 @@
+{
+  "data": {
+    "input_path": "data/raw/food.parquet",
+    "output_path": "data/processed/food_small.parquet",
+    "max_rows": 1000000
+  },
+  "model": {
+    "output_path": "models/openfoodfacts_kmeans",
+    "metrics_path": "artifacts/kmeans_metrics.json",
+    "predictions_path": "artifacts/food_clusters",
+    "profiles_path": "artifacts/cluster_profiles",
+    "categories_path": "artifacts/cluster_categories",
+    "examples_path": "artifacts/cluster_examples",
+
+    "min_k": 2,
+    "max_k": 8,
+    "seed": 42,
+    "max_iter": 50,
+    "tolerance": 0.0001
+  },
+  "preprocessing_features": [
+    "energy-kcal",
+    "fat",
+    "saturated-fat",
+    "carbohydrates",
+    "sugars",
+    "fiber",
+    "proteins",
+    "salt"
+  ],
+  "model_features": [
+    "energy-kcal",
+    "fat",
+    "carbohydrates",
+    "proteins",
+    "sugars"
+  ]
+}
