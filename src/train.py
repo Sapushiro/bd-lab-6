@@ -9,6 +9,7 @@ from pyspark.ml.feature import StandardScaler, StandardScalerModel, VectorAssemb
 from pyspark.sql import DataFrame, SparkSession
 
 from spark_session import SparkSessionFactory
+from cassandra_storage import CassandraStorage
 
 from logger import Logger
 
@@ -20,11 +21,8 @@ class KMeansTrainer:
         logger = Logger(show=True)
         self.log = logger.get_logger(__name__)
 
-        self.input_path = self.config["data"]["output_path"]
         self.feature_names = self.config["features"]
-
         model_config = self.config["model"]
-
         self.model_path = model_config["output_path"]
         self.metrics_path = model_config["metrics_path"]
         self.predictions_path = model_config["predictions_path"]
@@ -34,6 +32,14 @@ class KMeansTrainer:
         self.seed = model_config["seed"]
         self.max_iter = model_config["max_iter"]
         self.tolerance = model_config["tolerance"]
+
+        cassandra_config = self.config["cassandra"]
+        self.storage = CassandraStorage(
+            spark=self.spark,
+            keyspace=cassandra_config["keyspace"],
+            source_table=cassandra_config["source_table"],
+            result_table=cassandra_config["result_table"],
+        )
 
     @staticmethod
     def _load_config(config_path: str) -> dict:
@@ -46,12 +52,10 @@ class KMeansTrainer:
             return json.load(file)
 
     def read_data(self) -> DataFrame:
-        self.log.info("Reading prepared data: %s", self.input_path)
-        data = self.spark.read.parquet(self.input_path)
+        data = self.storage.read_products()
+        data = data.withColumnRenamed("energy_kcal", "energy-kcal")
 
         self.log.info("Input partitions: %d", data.rdd.getNumPartitions())
-        self.log.info("Input rows: %d", data.count())
-
         return data
 
     def prepare_features(self, data: DataFrame) -> tuple[DataFrame, VectorAssembler, StandardScalerModel]:
@@ -166,14 +170,15 @@ class KMeansTrainer:
             "prediction",
         ]
 
-        (
-            predictions
-            .select(*columns_to_save)
-            .write
-            .mode("overwrite")
-            .parquet(self.predictions_path)
+        result = (
+                predictions
+                .select(*columns_to_save)
+                .withColumnRenamed(
+                    "energy-kcal",
+                    "energy_kcal"
+                )
         )
-        self.log.info("Predictions saved: %s",self.predictions_path)
+        self.storage.write_predictions(result)
 
     def run(self) -> None:
         data = self.read_data()
@@ -191,12 +196,7 @@ class KMeansTrainer:
             self.save_metrics(metrics)
 
             predictions = best_model.transform(scaled_data)
-            predictions.persist(StorageLevel.MEMORY_AND_DISK)
-
-            try:
-                self.save_predictions(predictions)
-            finally:
-                predictions.unpersist()
+            self.save_predictions(predictions)
         finally:
             scaled_data.unpersist()
 
