@@ -2,7 +2,7 @@
   "data": {
     "input_path": "data/raw/food.parquet",
     "output_path": "data/processed/food_small.parquet",
-    "max_rows": 1000000
+    "max_rows": 100000
   },
   "cassandra": {
     "keyspace": "openfoodfacts",
